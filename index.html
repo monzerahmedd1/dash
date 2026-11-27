@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Data Privacy and Ethics Survey Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<style>
+:root{--bg:#F3F5F9;--card:#fff;--ink:#1F2937;--mut:#6B7280;--line:#E5E7EB;--acc:#4F46E5;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F172A;--card:#1E293B;--ink:#E5E7EB;--mut:#94A3B8;--line:#334155;--acc:#818CF8}}
+:root[data-theme="dark"]{--bg:#0F172A;--card:#1E293B;--ink:#E5E7EB;--mut:#94A3B8;--line:#334155;--acc:#818CF8}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--ink);font-family:Inter,"Segoe UI",Roboto,Arial,sans-serif}
+body{display:flex;justify-content:center;align-items:center}
+#app{width:min(100%,177.78vh);height:min(100%,56.25vw);font-size:min(.6vw,1.0667vh);display:grid;grid-template-rows:12fr 11fr 77fr;gap:.8em;padding:.8em;box-sizing:border-box}
+.card{background:var(--card);border-radius:.7em;box-shadow:0 1px 3px rgba(16,24,40,.1);min-width:0;min-height:0;overflow:hidden}
+#top{display:flex;align-items:center;gap:1.4em;padding:0 1em}
+#top h1{margin:0;font-size:1.5em;white-space:nowrap}
+#top small{color:var(--mut);font-size:.8em}
+#fl{display:flex;gap:1.2em;flex:1;justify-content:flex-end;align-items:center}
+.grp{display:flex;flex-direction:column;gap:.25em}
+.grp b{font-size:.7em;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+.chips{display:flex;gap:.3em}
+.chip{font:inherit;font-size:.8em;padding:.3em .7em;border-radius:2em;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;white-space:nowrap}
+.chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+#rs{font:inherit;font-size:.85em;font-weight:600;padding:.5em 1.1em;border:0;border-radius:.5em;background:var(--ink);color:var(--card);cursor:pointer}
+#kp{display:grid;grid-template-columns:repeat(5,1fr);gap:.8em;min-height:0}
+.k{padding:.5em 1em;display:flex;flex-direction:column;justify-content:center;border-left:.35em solid var(--c)}
+.k span{font-size:.85em;color:var(--mut);font-weight:600}
+.k strong{font-size:2em;color:var(--c);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#gr{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(3,1fr);gap:.8em;min-height:0}
+.g{width:100%;height:100%}
+.card.h{display:none}
+#gr.v{grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr)}
+</style></head><body>
+<div id="app">
+ <div id="top" class="card"><div><h1>Data Privacy and Ethics Survey</h1><small id="sub">Click any filter chip, or click a bar in the age, ads or policy charts</small></div><div id="fl"></div></div>
+ <div id="kp"></div>
+ <div id="gr"></div>
+</div>
+<script>
+const D={"l":{"age":["Under 18","18 - 24","25 - 34","35 - 44","45+"],"ads":["Yes","Not Sure","No"],"pol":["Rarely","Never","Sometimes"],"fear":["Private photos & chats","Passwords & Accounts","Bank & Financial information"],"meth":["Use strong passwords","Use Two-Factor Authentication (2FA)","Reject website cookies"],"theme":["Unclear / Off-topic","Stronger Laws & Accountability","Stronger Security & Data Protection","Transparency & User Control","Unknown / No Suggestion","Encryption","Technical Systems & Secure Infrastructure","Privacy Awareness & Education","Authentication & Access Control","Consent & Data Minimization","No Meaningful Answer","Preventing Misuse, Sale & Unauthorized Sharing"]},"r":[[1,0,2,1,0,2,5,1],[1,1,0,2,1,0,4,4],[1,0,1,0,1,0,4,2],[0,0,2,0,2,3,4,3],[0,0,0,1,2,1,5,3],[1,0,0,0,1,2,3,3],[0,0,1,0,2,0,5,1],[1,0,2,1,0,11,5,3],[1,0,2,0,0,6,5,1],[0,1,2,0,2,4,3,2],[1,0,0,0,0,0,3,3],[1,0,0,0,1,2,3,2],[1,0,2,1,0,0,5,5],[1,0,1,1,1,0,5,4],[1,2,2,1,1,0,5,1],[1,0,0,1,1,4,5,4],[1,0,2,1,0,1,3,1],[1,0,1,0,1,7,3,3],[1,0,1,0,0,4,3,5],[1,0,2,0,1,0,4,4],[1,1,0,0,1,0,3,2],[1,0,1,1,2,1,4,3],[1,0,2,2,1,4,5,4],[1,0,0,1,1,11,5,3],[1,1,1,2,0,0,4,3],[1,0,1,2,1,0,3,3],[1,0,2,0,0,1,5,3],[0,0,1,2,1,2,3,5],[1,0,1,1,1,0,3,4],[1,1,2,1,2,1,4,4],[1,2,1,1,0,0,2,1],[1,2,0,0,0,0,2,2],[1,1,1,0,0,0,5,3],[0,0,2,0,0,0,3,2],[0,0,0,1,0,0,5,3],[1,0,1,0,0,0,2,1],[1,0,2,1,1,8,5,5],[1,0,0,1,2,0,3,2],[1,0,1,0,0,3,4,2],[1,0,0,1,0,1,1,1],[1,0,2,0,2,0,5,2],[1,0,1,0,0,0,1,1],[1,0,0,0,0,0,5,3],[1,0,2,0,2,3,4,2],[1,0,0,0,0,0,5,5],[1,0,0,0,0,9,3,2],[1,2,0,0,0,0,2,1],[1,0,0,1,0,0,5,3],[1,0,0,2,0,0,2,1],[0,0,0,2,2,0,5,1],[0,1,1,0,2,0,5,5],[1,0,0,1,1,0,3,4],[0,0,2,0,0,1,2,3],[1,0,0,0,0,3,3,1],[1,0,1,1,1,0,3,1],[1,0,0,0,2,1,3,1],[0,0,1,2,0,10,1,1],[1,0,0,2,1,0,3,3],[1,1,1,0,1,10,4,4],[1,2,0,2,1,0,5,1],[1,0,2,2,1,10,3,2],[1,0,1,2,1,5,5,1],[1,0,0,2,1,5,5,1],[1,0,1,2,0,5,5,1],[1,0,1,0,1,0,5,3],[1,0,0,0,1,1,3,3],[1,0,2,0,1,2,4,4],[1,0,0,1,0,0,3,3],[1,0,2,1,0,2,5,3],[1,1,2,2,0,1,5,4],[1,0,1,0,0,2,4,3],[0,2,1,0,0,0,3,3],[1,0,1,1,2,5,5,3],[1,0,2,2,0,5,5,3],[1,0,2,2,0,7,5,3],[0,0,1,0,0,0,2,3],[1,0,1,1,0,2,2,3],[1,0,0,0,1,0,3,3],[1,0,1,1,0,0,5,1],[1,0,2,1,0,1,2,1],[1,1,1,1,0,4,2,3],[1,1,1,2,1,6,5,2],[0,0,1,0,2,0,3,2],[1,0,1,1,1,4,2,3],[1,1,1,0,0,2,5,3],[2,2,1,2,0,2,3,4],[1,0,0,1,1,7,3,3],[1,0,0,1,0,2,3,4],[0,1,2,1,1,0,5,2],[1,0,2,0,0,2,5,4],[2,0,2,2,0,0,3,2],[1,0,0,0,0,0,4,1],[3,0,2,2,0,0,3,2],[0,0,0,0,0,1,4,4],[1,0,2,1,2,0,3,1],[3,0,0,0,0,1,2,2],[1,0,1,0,1,1,4,4],[3,0,1,2,0,0,5,3],[1,0,0,0,0,2,3,3],[1,0,0,0,0,2,5,1],[1,1,0,2,0,4,3,2],[1,0,1,1,1,2,5,3],[1,0,0,0,0,0,5,3],[1,0,0,0,0,0,3,1],[1,0,2,0,2,3,3,1],[1,0,0,2,0,2,5,2],[1,0,0,1,2,0,5,3],[1,0,0,0,0,4,5,2],[3,0,0,0,1,0,4,2],[1,0,0,2,1,1,5,5],[1,0,0,0,2,4,3,1],[3,0,2,2,0,6,5,3],[3,1,2,1,0,0,3,2],[2,0,1,0,0,0,5,1],[1,0,1,0,1,0,3,3],[3,0,0,0,1,0,5,3],[1,0,2,2,1,3,4,3],[1,0,2,0,0,0,3,1],[3,0,0,2,1,0,3,2],[4,0,2,0,0,3,5,3],[3,0,0,0,2,3,5,2],[1,0,1,0,0,1,1,3],[1,0,2,0,2,2,4,3],[1,0,0,1,1,2,4,2],[1,0,2,1,0,9,5,3],[1,0,2,1,0,1,3,1],[1,0,2,0,0,1,3,3],[1,0,2,1,0,9,5,3],[3,0,2,0,0,8,5,1],[1,0,2,1,0,1,2,1],[1,0,1,0,0,2,3,2],[0,0,1,0,2,0,3,1],[1,1,0,0,2,0,5,3],[1,0,1,0,0,2,3,5],[1,0,1,0,1,0,3,3],[2,0,1,1,1,0,5,1],[1,0,1,0,0,0,2,2],[1,0,0,2,1,1,2,3],[1,0,1,1,0,1,3,5],[1,0,0,1,0,1,5,5],[1,0,1,1,0,0,4,4],[1,0,1,0,1,2,5,2],[1,1,2,2,1,0,3,3],[1,0,0,1,1,0,5,1],[1,0,0,1,0,0,3,4],[1,1,2,1,0,5,5,3],[1,0,1,0,1,1,5,4],[1,0,2,2,1,3,2,1],[1,0,1,1,1,0,3,4],[1,0,2,1,0,0,2,4],[1,0,2,0,0,0,5,1],[1,0,0,1,0,8,4,3],[1,0,0,2,1,0,4,3],[0,2,2,0,0,2,3,3],[1,0,2,1,2,1,3,3],[1,1,0,1,0,0,5,2],[1,0,0,0,0,6,5,3],[4,0,0,1,2,6,2,2],[1,0,2,2,0,0,1,3],[1,0,0,1,0,2,3,4],[1,0,2,1,0,3,5,4],[1,0,2,0,0,3,2,3],[1,0,1,2,0,0,3,3],[1,0,0,0,2,1,4,1],[0,0,1,1,2,3,5,2],[1,0,1,1,1,0,4,3]]},L=D.l;
+const R=D.r.map(a=>({age:L.age[a[0]],ads:L.ads[a[1]],pol:L.pol[a[2]],fear:L.fear[a[3]],meth:L.meth[a[4]],theme:L.theme[a[5]],c:a[6],t:a[7]}));
+const KEYS=["age","ads","pol","c","t"],S={};KEYS.forEach(k=>S[k]=new Set());
+const GROUPS=[["age","Age Group",L.age],["ads","Targeted Ads",L.ads],["pol","Policy Reading",L.pol],["c","Concern score",[1,2,3,4,5]],["t","Trust score",[1,2,3,4,5]]];
+const COL=["#4F46E5","#14B8A6","#F59E0B","#EF4444","#8B5CF6","#06B6D4"];
+const EXC=["Unclear / Off-topic","No Meaningful Answer","Unknown / No Suggestion","Blank / No Response"];
+const TT=["Data Leak Concern Distribution","Big Tech Trust Distribution","Concern vs Trust Distribution","Correlation: Concern vs Trust","Respondents by Age Group","Concern and Trust by Age","Targeted Ads Experience by Age (%)","Targeted Ads Experience","Privacy Policy Reading Frequency","Most Feared Personal Data","Privacy Protection Methods","Suggestions by Recommendation Theme"];
+const $=i=>document.getElementById(i),cfg={responsive:true,displaylogo:false,modeBarButtonsToRemove:["lasso2d","select2d"]};
+const mean=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:NaN;
+function corr(a,b){const n=a.length;if(n<3)return NaN;const p=mean(a),q=mean(b);let s=0,x=0,y=0;for(let i=0;i<n;i++){s+=(a[i]-p)*(b[i]-q);x+=(a[i]-p)**2;y+=(b[i]-q)**2}return x&&y?s/Math.sqrt(x*y):NaN}
+const wrap=s=>String(s).replace(/(.{1,20})(\s|$)/g,"$1<br>").replace(/<br>$/,"");
+function cnt(a,ord){const m={};a.forEach(x=>m[x]=(m[x]||0)+1);const k=ord?ord.filter(x=>m[x]):Object.keys(m).sort((p,q)=>m[q]-m[p]);return[k,k.map(x=>m[x])]}
+function lay(t,o){o=o||{};const s=getComputedStyle(document.documentElement),ln=s.getPropertyValue("--line").trim(),fs=Math.max(9,Math.round($("app").clientWidth/(V?120:150)));
+ const ax={gridcolor:ln,zerolinecolor:ln,automargin:true,tickfont:{size:fs-1}};
+ return{title:{text:t,x:.02,xanchor:"left",font:{size:fs+3}},margin:{l:10,r:16,t:o.leg?58:38,b:10},paper_bgcolor:"rgba(0,0,0,0)",plot_bgcolor:"rgba(0,0,0,0)",font:{color:s.getPropertyValue("--ink").trim(),size:fs},showlegend:!!o.leg,legend:{orientation:"h",x:0,y:1,yanchor:"bottom"},xaxis:Object.assign({},ax,o.x),yaxis:Object.assign({},ax,o.y),barmode:o.mode,dragmode:"zoom",annotations:o.an}}
+function plot(i,data,l,key){const e=$("g"+i);Plotly.react(e,data,l,cfg);if(key&&!e._k){e._k=1;e.on("plotly_click",v=>toggle(key,v.points[0].customdata))}}
+function bar(i,k,v,col,h,xt,yt,key){const hv="%{customdata}<br>Respondents: "+(h?"%{x}":"%{y}")+"<extra></extra>";
+ plot(i,[{type:"bar",x:h?v:k.map(wrap),y:h?k.map(wrap):v,orientation:h?"h":"v",marker:{color:col},text:v,textposition:"outside",cliponaxis:false,customdata:k,hovertemplate:hv}],lay(TT[i],{x:{title:xt},y:{title:yt,autorange:h?"reversed":true}}),key)}
+function render(){
+ const d=R.filter(r=>KEYS.every(k=>!S[k].size||S[k].has(r[k]))),c=d.map(r=>r.c),t=d.map(r=>r.t),r_=corr(c,t),f=x=>isNaN(x)?"-":x.toFixed(2);
+ $("k0").textContent=d.length;$("k1").textContent=isNaN(mean(c))?"-":f(mean(c))+" / 5";$("k2").textContent=isNaN(mean(t))?"-":f(mean(t))+" / 5";
+ $("k3").textContent=isNaN(r_)?"-":(r_>=0?"+":"")+f(r_);$("k4").textContent=cnt(d.map(r=>r.fear))[0][0]||"-";
+ if(!d.length){TT.forEach((x,i)=>Plotly.react($("g"+i),[],lay(x,{an:[{text:"No data for these filters",showarrow:false}]}),cfg));return}
+ const sc=a=>[1,2,3,4,5].map(v=>a.filter(x=>x===v).length),tk={tickvals:[1,2,3,4,5],range:[.4,5.6]};
+ [[0,c,COL[0],"Concern Score"],[1,t,COL[1],"Trust Score"]].forEach(([i,a,col,xt])=>{const y=sc(a);
+  plot(i,[{type:"bar",x:[1,2,3,4,5],y:y,marker:{color:col},text:y,textposition:"outside",cliponaxis:false,hovertemplate:"Score %{x}<br>Respondents: %{y}<extra></extra>"}],lay(TT[i],{x:Object.assign({title:xt},tk),y:{title:"Respondents"}}))});
+ plot(2,[{type:"box",orientation:"h",x:c,name:"Data Leak Concern",marker:{color:COL[0]}},{type:"box",orientation:"h",x:t,name:"Big Tech Trust",marker:{color:COL[1]}}],lay(TT[2],{x:{title:"Score",range:[.5,5.5]}}));
+ plot(3,[{type:"heatmap",z:[[1,r_],[r_,1]],x:["Concern","Trust"],y:["Concern","Trust"],zmin:-1,zmax:1,colorscale:"RdBu",reversescale:true,texttemplate:"%{z:.2f}",textfont:{size:16},showscale:false,hovertemplate:"%{y} and %{x}<br>r = %{z:.2f}<extra></extra>"}],lay(TT[3],{y:{autorange:"reversed"}}));
+ const ag=L.age.filter(a=>d.some(r=>r.age===a)),by=a=>d.filter(r=>r.age===a);
+ const [ak,av]=cnt(d.map(r=>r.age),L.age);bar(4,ak,av,COL[0],false,"Age Group","Respondents","age");
+ plot(5,[["Average Concern",r=>r.c,COL[0]],["Average Trust",r=>r.t,COL[1]]].map(([n,g,col])=>({type:"bar",name:n,x:ag,y:ag.map(a=>mean(by(a).map(g))),marker:{color:col},hovertemplate:"%{x}<br>"+n+": %{y:.2f}<extra></extra>"})),lay(TT[5],{leg:1,mode:"group",x:{title:"Age Group"},y:{title:"Average Score",range:[0,5]}}));
+ plot(6,L.ads.map((x,i)=>({type:"bar",name:x,x:ag,y:ag.map(a=>{const g=by(a);return 100*g.filter(r=>r.ads===x).length/g.length}),marker:{color:COL[i+1]},hovertemplate:"%{x}<br>"+x+": %{y:.1f}%<extra></extra>"})),lay(TT[6],{leg:1,mode:"stack",x:{title:"Age Group"},y:{title:"Percentage (%)",range:[0,100]}}));
+ let q=cnt(d.map(r=>r.ads));bar(7,q[0],q[1],COL[2],false,"Experience","Respondents","ads");
+ q=cnt(d.map(r=>r.pol));bar(8,q[0],q[1],COL[1],false,"Reading Frequency","Respondents","pol");
+ q=cnt(d.map(r=>r.fear));bar(9,q[0],q[1],COL[3],true,"Respondents","");
+ q=cnt(d.map(r=>r.meth));bar(10,q[0],q[1],COL[4],true,"Respondents","");
+ q=cnt(d.map(r=>r.theme).filter(x=>!EXC.includes(x)));bar(11,q[0],q[1],COL[0],true,"Number of Responses","")}
+function toggle(k,v){S[k].has(v)?S[k].delete(v):S[k].add(v);chips();render()}
+let V=0;
+function setView(n){V=n;$("gr").className=n?"v":"";[...$("gr").children].forEach((e,i)=>e.classList.toggle("h",n===1?i>5:n===2?i<6:false));chips();setTimeout(()=>{document.querySelectorAll(".g").forEach(e=>e.offsetParent&&Plotly.Plots.resize(e));render()},60)}
+function chips(){$("fl").innerHTML="";{const g=document.createElement("div");g.className="grp";g.innerHTML="<b>View</b>";const w=document.createElement("div");w.className="chips";["All 12","Slide 1","Slide 2"].forEach((x,n)=>{const b=document.createElement("button");b.className="chip"+(V===n?" on":"");b.textContent=x;b.onclick=()=>setView(n);w.appendChild(b)});g.appendChild(w);$("fl").appendChild(g)}GROUPS.forEach(([k,lb,vals])=>{const g=document.createElement("div");g.className="grp";g.innerHTML="<b>"+lb+"</b>";const w=document.createElement("div");w.className="chips";
+ vals.forEach(v=>{const b=document.createElement("button");b.className="chip"+(S[k].has(v)?" on":"");b.textContent=v;b.onclick=()=>toggle(k,v);w.appendChild(b)});g.appendChild(w);$("fl").appendChild(g)});
+ const r=document.createElement("button");r.id="rs";r.textContent="Reset";r.onclick=()=>{KEYS.forEach(k=>S[k].clear());chips();render()};$("fl").appendChild(r)}
+[["Respondents","#4F46E5"],["Average Data Leak Concern","#EF4444"],["Average Big Tech Trust","#14B8A6"],["Concern vs Trust (r)","#F59E0B"],["Most Feared Data","#8B5CF6"]].forEach(([n,c],i)=>{$("kp").insertAdjacentHTML("beforeend",'<div class="card k" style="--c:'+c+'"><span>'+n+'</span><strong id="k'+i+'">-</strong></div>')});
+for(let i=0;i<12;i++)$("gr").insertAdjacentHTML("beforeend",'<div class="card"><div class="g" id="g'+i+'"></div></div>');
+const VH={"slide-1":1,"slide-2":2};chips();render();if(VH[location.hash.slice(1)])setView(VH[location.hash.slice(1)]);addEventListener("hashchange",()=>setView(VH[location.hash.slice(1)]||0));
+let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(render,150)});
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",render);
+</script></body></html>
